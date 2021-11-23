@@ -87,29 +87,23 @@
 </template>
 <script>
 import { Card } from "@/components/index";
-
+import axios from 'axios'
 export default {
     components: {
         Card,
     },
     data() {
         return {
+            url: 'http://192.168.101.51:5000/',
             items: [
-                { first_collumn: "USER NAME", last_collumn: "Thành đẹp trai" },
+                { first_collumn: "USER NAME", last_collumn: "" },
                 { first_collumn: "USER STATUS", last_collumn: "Active" },
-                { first_collumn: "USER ID", last_collumn: "214125432465ad" },
-                { first_collumn: "ROLE", last_collumn: "10/12/2020" },
-                { first_collumn: "CONTACT", last_collumn: "036789 10JQK" },
-                { first_collumn: "NOTE", last_collumn: "Thành đẹp trai số 2 không ai số 1" },
+                { first_collumn: "USER ID", last_collumn: "" },
+                { first_collumn: "ROLE", last_collumn: "" },
+                { first_collumn: "CONTACT", last_collumn: "" },
+                { first_collumn: "NOTE", last_collumn: "" },
                 { first_collumn: "BOX", last_collumn: [
-                    {
-                        "status": "Online",
-                        "name": "alo1"
-                    }, 
-                    {
-                        "status": "Offline",
-                        "name": "alo2"
-                    }, 
+
                 ]},
                 { first_collumn: "NOTIFICATION", last_collumn: true },
             ],
@@ -125,6 +119,19 @@ export default {
                 },
             });
         }
+    },
+    mounted() {
+        this.id = this.$route.params.id
+        this.AuthStr =sessionStorage.getItem("token");
+        axios
+            .get(this.url + "user/" + this.id, { headers: { Authorization: this.AuthStr } })
+            .then((response) => {
+                this.items[0].last_collumn = response.data.name
+                this.items[2].last_collumn = response.data.id
+                this.items[3].last_collumn = response.data.role
+                this.items[4].last_collumn = response.data.phoneNumber
+            })
+            .catch((error) => console.log(error));   
     }
 };
 </script>

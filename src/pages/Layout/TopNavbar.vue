@@ -72,7 +72,7 @@
                         <router-link
                             tag='a'
                             class="nav-item dropdown-item"
-                            to='/'
+                            to='/login'
                         >Log out</router-link>
                   </li>
                 </ul>

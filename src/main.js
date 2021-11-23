@@ -16,6 +16,7 @@
 
 */
 import Vue from "vue";
+import axios from "axios";
 import VueRouter from "vue-router";
 import SocialSharing from "vue-social-sharing"
 import VueGitHubButtons from "vue-github-buttons"
@@ -39,14 +40,35 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.config.productionTip = false;
 
+
+
 // router setup
 import routes from "./router";
 
 // configure router
 const router = new VueRouter({
   routes, // short for routes: routes
-  linkExactActiveClass: "active"
+  linkExactActiveClass: "active",
+  mode: 'history'
 });
+
+
+axios.interceptors.response.use(
+    function (response) {
+        return response;
+    },
+    function (error) {
+        console.log("error: ", error);
+        const {status} = error.response;
+        if ( status === 401 && !window.location.pathname.startsWith("/login")) {
+            router.push("/")
+        }
+        return Promise.reject(error);
+    }
+);
+
+
+
 
 Vue.use(VueRouter);
 Vue.use(SocialSharing);

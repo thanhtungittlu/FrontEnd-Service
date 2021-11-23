@@ -36,7 +36,7 @@ data () {
         "email" : "",
         "password" : "",
         },
-        url: 'http://192.168.101.122:5000/',
+        url: 'http://192.168.101.51:5000/',
         }
 },   
 methods: {
@@ -47,7 +47,7 @@ methods: {
             .post(this.url + "login",this.login_)
             .then((response) => {
             sessionStorage.setItem('token', response.data.access_token);    
-            this.$router.push("/dashboard")
+            this.$router.push("/")
             this.$notify({
                 component: LoginSuccess,
                 verticalAlign: "top",

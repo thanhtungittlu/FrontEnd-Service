@@ -13,7 +13,7 @@
                 <img src="/img/loupe.png" />
                 <input
                     class="base-input"
-                    placeholder="Nhập tên user"
+                    placeholder="Nhập tên email hoặc role"
                     @input="debounceInput"
                 />
             </div>
@@ -47,13 +47,13 @@
 
                 <template v-slot:cell(status)="data">
                     <div
-                        v-if="data.value=='online'"
+                        v-if="data.value == true "
                     >
                         <span class="green-dot"></span>
                         {{ data.value }}
                     </div>
                     <div
-                        v-else-if="data.value=='offline'"
+                        v-else-if="data.value== false "
                     >
                        <span class="grey-dot"></span>
                         {{ data.value }}
@@ -96,6 +96,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 import { InfoCard } from "@/components";
 import _ from "lodash";
 export default {
@@ -103,15 +104,17 @@ export default {
         debounceInput: _.debounce(function (e) {
             this.filters = e.target.value;
         }, 500),
+
         getInfoUser(data) {
+            console.log(data.id);
             this.$router.push({
                 name: "Thông tin chi tiết của user",
                 params: {
-                    id: data.id,
-                    data: data.id,
+                    id: data.id
                 },
             });
         },
+
         createUser() {
             this.$router.push({
                 name: "Tạo user",
@@ -126,12 +129,9 @@ export default {
             const filtered = this.items.filter((item) => {
                 return Object.keys(this.filters).every(
                     (key) =>
-                        String(item["userName"])
+                        String(item["email"])
                             .toLowerCase()
                             .includes(this.filters.toLowerCase()) ||
-                        String(item["userEmail"])
-                            .toLowerCase()
-                            .includes(this.filters.toLowerCase()) || 
                         String(item["role"])
                             .toLowerCase()
                             .includes(this.filters.toLowerCase())
@@ -152,23 +152,12 @@ export default {
     },
     data() {
         return {
-            items: [
-                { id: "1", userName: "Thành", userEmail: "thanh@cxview.ai", role: "manager", box: "1"},
-                { id: "2", userName: "Hoàng", userEmail: "hoang@cxview.ai", role: "manager", box: "2"},
-                { id: "3", userName: "Hùng", userEmail: "hung@cxview.ai", role: "manager", box: "3"},
-                { id: "4", userName: "Hiền", userEmail: "hien@cxview.ai", role: "manager", box: "4"},
-                { id: "5", userName: "Thái", userEmail: "thai@cxview.ai", role: "manager", box: "5"},
-                { id: "6", userName: "Khoa", userEmail: "khoa@cxview.ai", role: "manager", box: "6"},
-                { id: "7", userName: "Tân", userEmail: "tan@cxview.ai", role: "manager", box: "7"},
-                { id: "8", userName: "Tùng", userEmail: "tung@cxview.ai", role: "manager", box: "8"},
-                { id: "9", userName: "Minh", userEmail: "minh@cxview.ai", role: "manager", box: "9"},
-                { id: "10", userName: "Nam", userEmail: "nam@cxview.ai", role: "manager", box: "10"},
-                { id: "11", userName: "Hải", userEmail: "hai@cxview.ai", role: "manager", box: "11"},
-                { id: "12", userName: "Linh", userEmail: "linh@cxview.ai", role: "manager", box: "12"},
-                { id: "13", userName: "Trang", userEmail: "trang@cxview.ai", role: "manager", box: "13"},
-                { id: "14", userName: "Sơn", userEmail: "son@cxview.ai", role: "manager", box: "14"},
-                { id: "15", userName: "Trung", userEmail: "trung@cxview.ai", role: "manager", box: "15"},
-            ],
+            url: 'http://192.168.101.51:5000/',
+            // items: [
+            //     { id: "1", email: "thanh@cxview.ai",  boxNumber: "1", role: "boss", status: "true"} ,
+            //     { id: "2", email: "hoang@cxview.ai",  boxNumber: "2", role: "boss", status: "false"} ,
+            // ],
+            items: [],
             filters: "",
             imageInfo: "./img/icons8-info-48.png",
             imageDelete: "./img/delete.png",
@@ -177,13 +166,13 @@ export default {
             totalRows: 15,
             fields: [
                 {
-                    key: "userName",
-                    label: "user name",
+                    key: "email",
+                    label: "Email",
                 },
 
                 {
-                    key: "userEmail",
-                    label: "Owner",
+                    key: "boxNumber",
+                    label: "Box Number",
                 },
 
                 {
@@ -191,16 +180,27 @@ export default {
                     label: "role",
                 },
                 {
-                    key: "box",
-                    label: "box",
+                    key: "status",
+                    label: "Status",
                 },
-                {
+                { 
                     key: "action",
-                    label: "action", 
-                }
+                    label: "Action",
+                },
+
             ],
         };
     },
+    mounted() {
+        this.AuthStr =sessionStorage.getItem("token");
+        axios
+            .get(this.url + "users", { headers: { Authorization: this.AuthStr } })
+            .then((response) => {
+                this.items= response.data
+                
+            })
+            .catch((error) => console.log(error));
+    }
 };
 </script>
 

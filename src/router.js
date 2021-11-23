@@ -25,7 +25,7 @@ import AddUser from "@/pages/UserManagement/AddUser.vue"
 
 const routes = [
     {
-        path: '/',
+        path: '/login',
         name: 'login',
         component: Login
     },
