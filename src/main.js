@@ -16,6 +16,7 @@
 
 */
 import Vue from "vue";
+import Vuex from 'vuex';
 import axios from "axios";
 import VueRouter from "vue-router";
 import SocialSharing from "vue-social-sharing"
@@ -38,8 +39,9 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-Vue.config.productionTip = false;
+import { store } from './store.js';
 
+Vue.config.productionTip = false;
 
 
 // router setup
@@ -55,13 +57,14 @@ const router = new VueRouter({
 
 axios.interceptors.response.use(
     function (response) {
+
         return response;
     },
     function (error) {
         console.log("error: ", error);
         const {status} = error.response;
         if ( status === 401 && !window.location.pathname.startsWith("/login")) {
-            router.push("/")
+            router.push("/login")
         }
         return Promise.reject(error);
     }
@@ -81,9 +84,11 @@ Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
 Vue.use(Notify);
+Vue.use(Vuex);
 
 
 new Vue({
+  store,
   router,
   i18n,
   render: h => h(App)

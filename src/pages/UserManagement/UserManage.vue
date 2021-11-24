@@ -106,7 +106,7 @@ export default {
         }, 500),
 
         getInfoUser(data) {
-            console.log(data.id);
+            
             this.$router.push({
                 name: "Thông tin chi tiết của user",
                 params: {
@@ -152,7 +152,7 @@ export default {
     },
     data() {
         return {
-            url: 'http://192.168.101.51:5000/',
+            
             // items: [
             //     { id: "1", email: "thanh@cxview.ai",  boxNumber: "1", role: "boss", status: "true"} ,
             //     { id: "2", email: "hoang@cxview.ai",  boxNumber: "2", role: "boss", status: "false"} ,
@@ -192,9 +192,9 @@ export default {
         };
     },
     mounted() {
-        this.AuthStr =sessionStorage.getItem("token");
+        this.AuthStr = sessionStorage.getItem("token");
         axios
-            .get(this.url + "users", { headers: { Authorization: this.AuthStr } })
+            .get(this.$store.state.url + "users", { headers: { Authorization: this.AuthStr } })
             .then((response) => {
                 this.items= response.data
                 

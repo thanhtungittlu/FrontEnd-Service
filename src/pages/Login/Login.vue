@@ -1,30 +1,29 @@
 <template>
-    <div class="login">
+    <div @keyup.enter="doLogin" class="login">
         <div class="account-login">
             <h1>Account Login</h1>
-            <form action="" class="login-form">
+            <div class="login-form">
                 <div class="form-group">
                     <input v-model="loginEmail" type="text" placeholder="Email" class="form-control">
                 </div>
                 <div class="form-group">
                     <input v-model="loginPassword" type="password" placeholder="Password"  class="form-control">
                 </div>
-                <button class="btn" @click="login">Login</button>
+                <button class="btn" @click="doLogin">Login</button>
 
                 <div class="option-footer">
                     <a href="#" class="pull-left ">Sign Up</a>
                     <a href="#" class="pull-right ">Forgot Password?</a>
                 </div>  
-            </form>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import axios from "axios"
-import LoginSuccess from '../Notifications/LoginSuccess.vue';
-import LoginFailed from '../Notifications/LoginFailed.vue';
-
+import LoginSuccess from '../Notifications/Login/LoginSuccess.vue';
+import LoginFailed from '../Notifications/Login/LoginFailed.vue';
 
 export default {
 data () {
@@ -32,33 +31,33 @@ data () {
         loginEmail: null,
         loginPassword: null,
         admins: null,
-        login_ :{
-        "email" : "",
-        "password" : "",
+        loginData :{
+            "email" : "",
+            "password" : "",
         },
-        url: 'http://192.168.101.51:5000/',
-        }
+    }
 },   
 methods: {
-    login(){
-        this.login_.email = this.loginEmail;
-        this.login_.password = this.loginPassword;
+    doLogin(){
+        this.loginData.email = this.loginEmail;
+        this.loginData.password = this.loginPassword;
         axios
-            .post(this.url + "login",this.login_)
+            .post(this.$store.state.url + "login",this.loginData)
             .then((response) => {
-            sessionStorage.setItem('token', response.data.access_token);    
-            this.$router.push("/")
-            this.$notify({
-                component: LoginSuccess,
-                verticalAlign: "top",
-                horizontalAlign: "right",
-                icon: "tim-icons icon-bell-55",
-                type: "info" ,
-                // type:["","info","success","warning","danger"],
-                timeout: 2000 // Tính theo mls
-            });
+                sessionStorage.setItem('token', response.data.access_token); 
+                this.$router.push('/');
+                this.$notify({
+                    component: LoginSuccess,
+                    verticalAlign: "top",
+                    horizontalAlign: "right",
+                    icon: "tim-icons icon-bell-55",
+                    type: "info" ,
+                    // type:["","info","success","warning","danger"],
+                    timeout: 2000 // Tính theo mls
+                });   
             })
             .catch(error => {
+                console.log(error);
                 this.$notify({
                     component: LoginFailed,
                     verticalAlign: "top",
@@ -71,9 +70,9 @@ methods: {
             }) 
     },
 },
-mounted () {
+mounted(){
     
-    }
+}
 }
 </script>
 

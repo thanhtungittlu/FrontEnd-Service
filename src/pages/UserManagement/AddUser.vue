@@ -4,43 +4,58 @@
            
             <div class="add-employee-container">
                 <div class="form-add-employee">
-                    <h3 style="font-color:black">Quản lý user</h3>
+                    <h3 style="font-color:black">Thêm User</h3>
                     <div class="info-employee">
                         <BaseUserInput
-                            title="Email"
-                            :value="dataInfoUser.email"
-                            @phoneNumber="changeInputName"
+                            title="Email(*)"
+                            type="email"
+                            :responseEmail="responseEmail"
+                            @valueGender="valueEmail"                
                         />
+
                         <BaseUserInput
-                            title="Mật khẩu"
-                            :value="dataInfoUser.password"
-                            @age="changeInputPassword"
-                        />
+                            title="Mật khẩu(*)"
+                            type="password"
+                            :responsePassword="responsePassword"
+                            @valueGender="valuePassword"  
+                        /> 
                         <BaseUserInput
-                            title="Note"
-                            :value="dataInfoUser.note"
-                            @age="changeInputNote"
+                            title="Name"
+                            :responseName="responseName" 
+                            @valueGender="valueName"  
                         />
                         <BaseUserInput
                             title="Số điện thoại"
-                            :value="dataInfoUser.note"
-                            @age="changeInputNote"
+                            :responsePhonenumber="responsePhonenumber" 
+                            @valueGender="valuePhonenumber"  
+                        />
+                        <BaseUserInput
+                            title="Note"
+                            :responseNote="responseNote" 
+                            @valueGender="valueNote"  
+                        />
+                        
+                        <BaseUserInput
+                            title="ApiUrl"
+                            :responseUrl="responseUrl" 
+                            @valueGender="valueUrl"  
                         />
                         <BaseUserInput
                             title="Cửa hàng quản lý"
                             option="formSelect"
                             :responseGroup="responseGroup"
+                            @selectedGender="selectedGroup"
                             :listData="listGroup"
                             :isRequired="isRequired"
-                            @selectedGender="selectedGroup"
+                            
                         />
                         <BaseUserInput
                             title="Role"
                             option="formSelect"
-                            :responseGroup="responseRole"
+                            :responseRole="responseRole"
+                             @selectedGender="selectedRole"
                             :listData="listRole"
-                            :isRequired="isRequired"
-                            @selectedGender="selectedGender"
+                            :isRequired="isRequired"   
                         />
                         
                     </div>
@@ -56,7 +71,7 @@
                         </div>
                         <div
                             class="btn-employee btn-cancel-employee"
-                            @click="redirectEmployeeManage"
+                            @click="redirectUserManage"
                         >
                             Hủy bỏ
                         </div>
@@ -69,6 +84,13 @@
 
 <script>
 import { BaseUserInput } from "@/components";
+import AddUserSuccess from '../Notifications/UserManage/AddUserSuccess.vue';
+import EmailFailed from '../Notifications/UserManage/EmailFailed.vue';
+import PasswordFailed from '../Notifications/UserManage/PasswordFailed.vue';
+import PhoneNumberFailed from '../Notifications/UserManage/PhoneNumberFailed.vue';
+import RoleFailed from '../Notifications/UserManage/RoleFailed.vue';
+
+import axios from 'axios';
 
 const defaultImageSource = "./img/user.png";
 
@@ -83,18 +105,24 @@ export default {
             listRole: ["boss", "manager"],
             responseGroup: "",
             responseRole: "",
+            
             dataInfoUser: {
+                name: "",
                 email: "",
                 password: "",
+                phoneNumber: "",
+                apiURL:"",
                 note: "",
-                listGroup: [],
-                role: ""
+                listGroup: "",
+                role: "",
             },
 
             idUser: localStorage.getItem("idUser"),
             AVATAR_PICKER_ID: "avatar-file-picker",
             avatarEmp: defaultImageSource,
             isSearch: true,
+            
+
         };
     },
     created() {
@@ -102,27 +130,152 @@ export default {
     },
 
     methods: {
-        changeInputName(val) {
+        valueEmail(val) {
             this.dataInfoUser.email = val;
         },
-        changeInputPassword(val) {
+        valuePassword(val) {
             this.dataInfoUser.password = val;
         },
-        changeInputNote(val) {
+        valueName(val) {
+            this.dataInfoUser.name = val;
+        },
+        valuePhonenumber(val) {
+            this.dataInfoUser.phoneNumber = val;
+        },
+        valueNote(val) {
             this.dataInfoUser.note = val;
+        },
+        valueUrl(val) {
+            this.dataInfoUser.apiURL = val;
         },
         selectedGroup(val) {
             this.dataInfoUser.listGroup = val;
         },
-        addNewUser() {
-            console.log("ayoooo: ")
+        selectedRole(val) {
+            this.dataInfoUser.role = val;
         },
 
-        redirectEmployeeManage() {
-            window.location.href = "/#/face-recogition/manage-customer";
+        checkErrorEmail() {
+            var regexName =
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; 
+            if (!regexName.test(this.dataInfoUser.email.trim())) {
+                return true; // Có lỗi
+            } else {
+                return false; // Không lỗi
+            }
+        },
+        checkErrorPassword() { 
+            if (this.dataInfoUser.password.trim() == "") { // Không được rỗng
+                return true; // Có lỗi
+            } else {
+                return false; // Không lỗi
+            }
+        },
+        checkErrorPhonenumber() {
+            var regexName = /^[0-9]{0,12}$/; // là số từ 0-12 ký tự
+            if (
+                !regexName.test(this.dataInfoUser.phoneNumber.replace(/\s/g, ""))
+            ) {
+                return true; // Có lỗi
+            } else {
+                return false; // Không có lỗi
+            }
+        },
+        checkErrorRole() { 
+            if (this.dataInfoUser.role.trim() == "") { // Không được rỗng
+                return true; // Có lỗi
+            } else {
+                return false; // Không lỗi
+            }
+        },
+        checkErrorInput() {
+            if (
+                this.checkErrorPassword() == false &&
+                this.checkErrorEmail() == false &&
+                this.checkErrorPhonenumber() == false&&
+                this.checkErrorRole() == false
+            ) {
+                return false; // tất cả không có lỗi thì trả về không lỗi
+            }
+            return true;
+        },
+
+
+        addNewUser() {
+            if (this.checkErrorInput() == false) { // Nếu không có lỗi thì thêm vào DB        
+                axios
+                    .post(this.$store.state.url + "insert", this.dataInfoUser , { headers: { Authorization: this.AuthStr } })
+                    .then((response) => {
+                        this.$router.push("/user-manage");
+                        this.$notify({
+                            component: AddUserSuccess,
+                            verticalAlign: "top",
+                            horizontalAlign: "right",
+                            icon: "tim-icons icon-bell-55",
+                            type: "success" ,
+                            // type:["","info","success","warning","danger"],
+                            timeout: 3000 // Tính theo mls
+                        });
+                    })
+                    .catch((error) => {
+                        alert(error);
+                    });
+
+            } else {
+                if (this.checkErrorPassword() == true) {
+                    this.$notify({
+                        component: PasswordFailed,
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        icon: "tim-icons icon-bell-55",
+                        type: "danger" ,
+                        // type:["","info","success","warning","danger"],
+                        timeout: 4000 // Tính theo mls
+                    });
+                }
+                if (this.checkErrorEmail() == true) {
+                    this.$notify({
+                        component: EmailFailed,
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        icon: "tim-icons icon-bell-55",
+                        type: "danger" ,
+                        // type:["","info","success","warning","danger"],
+                        timeout:4000 // Tính theo mls
+                    });
+                }
+                if (this.checkErrorPhonenumber() == true) {
+                    this.$notify({
+                        component: PhoneNumberFailed,
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        icon: "tim-icons icon-bell-55",
+                        type: "danger" ,
+                        // type:["","info","success","warning","danger"],
+                        timeout: 4000 // Tính theo mls
+                    });
+                }
+                if (this.checkErrorRole() == true) {
+                    this.$notify({
+                        component: RoleFailed,
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        icon: "tim-icons icon-bell-55",
+                        type: "danger" ,
+                        // type:["","info","success","warning","danger"],
+                        timeout: 4000 // Tính theo mls
+                    });
+                }
+            }
+        },
+        redirectUserManage() {
+            window.location.href = "/user-manage";
         },
     },
     watch: {},
+    mounted() {
+        this.AuthStr =sessionStorage.getItem("token");
+    }
 };
 </script>
 
@@ -226,5 +379,8 @@ export default {
             }
         }
     }
+}
+.add-employee-container h3 {
+    color: #000 !important;
 }
 </style>

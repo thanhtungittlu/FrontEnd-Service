@@ -24,9 +24,10 @@
             </div>
             <div class="">
                 <input
+                    :type="type"
+                    v-model="value"
                     class="base-input"
-                    @input="debounceInput"
-                    :value="value"
+                    @input="debounceInput" 
                 />
             </div>
         </template>
@@ -43,6 +44,9 @@ moment.locale("vi");
 
 export default {
     props: {
+        type: {
+            type: String,
+        },
         title: {
             type: String,
         },
@@ -68,6 +72,7 @@ export default {
         return {
             date: new Date(),
             selected: "",
+            value:"",
             isShow: false,
         };
     },
@@ -77,13 +82,36 @@ export default {
         }, 200),
     },
     watch: {
+        responseEmail(val) {
+            this.value = val;
+        },
+        responsePassword(val) {
+            this.value = val;
+        },
+        responseName(val) {
+            this.value = val;
+        },
+        responsePhonenumber(val) {
+            this.value = val;
+        },
+        responseNote(val) {
+            this.value = val;
+        },
+        responseUrl(val) {
+            this.value = val;
+        },
         responseGroup(val) {
             this.selected = val;
         },
-
+        responseRole(val) {
+            this.selected = val;
+        },
         //Emit to add employee
         selected(val) {
             this.$emit("selectedGender", val);
+        },
+        value(val) {
+            this.$emit("valueGender", val);
         },
     },
 };

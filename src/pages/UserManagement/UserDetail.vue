@@ -94,7 +94,7 @@ export default {
     },
     data() {
         return {
-            url: 'http://192.168.101.51:5000/',
+            
             items: [
                 { first_collumn: "USER NAME", last_collumn: "" },
                 { first_collumn: "USER STATUS", last_collumn: "Active" },
@@ -124,7 +124,7 @@ export default {
         this.id = this.$route.params.id
         this.AuthStr =sessionStorage.getItem("token");
         axios
-            .get(this.url + "user/" + this.id, { headers: { Authorization: this.AuthStr } })
+            .get(this.$store.state.url + "user/" + this.id, { headers: { Authorization: this.AuthStr } })
             .then((response) => {
                 this.items[0].last_collumn = response.data.name
                 this.items[2].last_collumn = response.data.id
